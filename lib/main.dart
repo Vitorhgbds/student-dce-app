@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:com.example.student_id_app/app/app.bottomsheets.dart';
-import 'package:com.example.student_id_app/app/app.dialogs.dart';
-import 'package:com.example.student_id_app/app/app.locator.dart';
-import 'package:com.example.student_id_app/app/app.router.dart';
-import 'package:stacked_services/stacked_services.dart';
+import 'package:meia_entrada/src/dependencies.dart';
+import 'package:meia_entrada/src/app/app_config.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_web_plugins/url_strategy.dart';
 
-Future<void> main() async {
+import 'src/app/app.dart';
+import 'src/app/app_constants.dart';
+import 'src/providers.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await setupLocator();
-  setupDialogUi();
-  setupBottomSheetUi();
-  runApp(const MainApp());
-}
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: Routes.startupView,
-      onGenerateRoute: StackedRouter().onGenerateRoute,
-      navigatorKey: StackedService.navigatorKey,
-      navigatorObservers: [StackedService.routeObserver],
-    );
-  }
+  initDependencies();
+  usePathUrlStrategy();
+  runApp(
+    Directionality(
+      textDirection: TextDirection.ltr,
+      child: Banner(
+        location: BannerLocation.topStart,
+        message: "dev",
+        textDirection: TextDirection.ltr,
+        child: ProviderScope(
+          overrides: [
+            configProvider.overrideWith(
+              (_) => AppConfig(
+                appTitle: AppConstants.appNameDev,
+                buildFlavor: AppFlavor.dev,
+              ),
+            ),
+          ],
+          child: const App(),
+        ),
+      ),
+    ),
+  );
 }
